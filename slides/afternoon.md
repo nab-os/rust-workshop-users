@@ -30,6 +30,18 @@ Result<T, E>  // Ok(x) or Err(e), propagate with ?
 
 ---
 
+## Warm-up: Option and Result
+
+```sh
+cd morning/exercises
+cargo run --bin ex05_option_result
+```
+
+Division that can fail, a search that may find nothing, parsing a
+temperature. 15 minutes, then we start the project.
+
+---
+
 ## The project: `labstats`
 
 A command line tool for a file of lab measurements.
@@ -59,7 +71,7 @@ Instructions: `afternoon/project.md`
 | 3 | Ownership and borrowing | memory management |
 | 4 | Group and summarize | `HashMap`, `BTreeMap`, iterators |
 | 5 | Save a report, append data | writing files |
-| 6 | Library + program | cargo workspaces, tests |
+| 6 | Library + program (demo) | cargo workspaces, tests |
 
 **Lost? Copy `checkpoints/stepN` and carry on.**
 

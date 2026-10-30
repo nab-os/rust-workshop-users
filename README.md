@@ -59,6 +59,8 @@ with `--bin`, so a broken one doesn't stop the others from building.
 - `ex02` to `ex05` compile, but crash with `not yet implemented` until you
   replace every `todo!()`. Warnings about unused variables are expected
   until then.
+- In the morning we do `ex01`, `ex02` and `ex04`. `ex03` is for whoever
+  finishes early (or for later), and `ex05` is the warm-up after lunch.
 - An exercise is finished when it prints `exNN done!`.
 
 ## Afternoon project

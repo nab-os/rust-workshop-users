@@ -451,13 +451,11 @@ match score {
 
 ---
 
-## Exercise 3: control flow
+## No exercise for this one
 
-```sh
-cargo run --bin ex03_control_flow
-```
-
-Collatz steps, letter grades, counting positive numbers.
+Loops and `if` work the way you expect. There is an exercise anyway,
+`ex03_control_flow` (Collatz steps, letter grades, counting), for whoever
+finishes the others early, or for later.
 
 ---
 
@@ -613,11 +611,14 @@ let t = parse_celsius("21.5").expect("bad");   // panics with a message
 
 ---
 
-## Exercise 5: Option and Result
+## Exercise 5, after lunch
 
 ```sh
 cargo run --bin ex05_option_result
 ```
+
+The project this afternoon starts with it: reading a file is the first thing
+that can fail.
 
 ---
 

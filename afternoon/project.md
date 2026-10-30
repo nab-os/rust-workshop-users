@@ -40,6 +40,20 @@ and continue from there. Nobody needs to finish every step on their own.
 
 ---
 
+## Warm-up: `ex05_option_result`
+
+Before touching the project, do the last morning exercise:
+
+```sh
+cd morning/exercises
+cargo run --bin ex05_option_result
+```
+
+Reading a file, parsing a number, finding a sample: everything in this
+project can fail, so `Option` and `Result` are everywhere in it.
+
+---
+
 ## Step 1: read a text file
 
 ```sh
@@ -256,6 +270,9 @@ Checkpoint: `checkpoints/step5`.
 ---
 
 ## Step 6: a cargo workspace
+
+This step is shown as a demo at the end of the day. If we run out of time,
+follow it at home from `checkpoints/step5`.
 
 Goal: split the code into
 

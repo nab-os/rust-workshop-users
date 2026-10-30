@@ -9,6 +9,14 @@ rustup installs the compiler (`rustc`), the build tool (`cargo`) and the
 standard library, and keeps them up to date. It installs into your home
 directory, so you don't need admin rights on Linux or macOS.
 
+Don't install Rust from your distribution's packages (`apt install rustc`,
+`dnf install rust`, Homebrew). Those versions are often a year or more
+behind, and the workshop material needs Rust 1.85 or newer. If you already
+have one of those, remove it first, or at least make sure `rustc --version`
+reports the rustup one after installing.
+
+If you installed rustup a while ago, run `rustup update` now.
+
 **Linux / macOS**
 
 ```sh
@@ -29,6 +37,13 @@ Download and run `rustup-init.exe` from <https://rustup.rs>. It will offer to
 install the Visual Studio C++ Build Tools: say yes, they provide the linker.
 (If you'd rather work inside WSL, follow the Linux instructions there instead.)
 
+## A note on Windows
+
+All the commands in the material are written for a Linux or macOS terminal
+(`cp`, `mkdir`, `./program`). The `cargo` commands are identical on Windows,
+and the rest translates easily, but if you'd rather not translate, install
+WSL and work inside it. Everything else below applies to WSL as well.
+
 ## 2. Check that it works
 
 ```sh
@@ -36,7 +51,8 @@ rustc --version
 cargo --version
 ```
 
-Both should print a version number, 1.85 or newer.
+Both should print a version number, 1.85 or newer. If you see something
+older, you're probably running a distribution package rather than rustup.
 
 ## 3. Set up an editor
 

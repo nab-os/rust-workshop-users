@@ -160,27 +160,28 @@ has to give that memory back at some point.
 
 ## Three answers to "who frees it?"
 
-In C, you do, by hand. Forget and you leak, do it twice and you crash.
+- C: you do, by hand
+- Python, Java: a garbage collector, at runtime
+- C++: destructors, when the variable goes out of scope
+- Rust: like C++, plus a compile-time check
 
-In Python (and Java, Go...), a garbage collector does it while the program
-runs. Convenient, costs some speed and some predictability.
-
-In C++, destructors do it when a variable goes out of scope. That works
-well, as long as nobody keeps a pointer to something that was destroyed.
-Nothing stops you from doing that.
-
-Rust takes the C++ idea, scope-based, no runtime cost, and adds a compiler
-check that nobody is still pointing at the memory when it's freed. That
-check is called ownership, and it's what the rest of this hour is about.
+<!--
+C: forget and you leak, do it twice and you crash.
+GC: convenient, costs some speed and predictability.
+C++: works well as long as nobody keeps a pointer to something destroyed.
+Nothing stops you.
+Rust takes the C++ idea, scope-based and free at runtime, and adds a check
+that nobody still points at the memory when it is freed. That check is
+ownership, and it is what the rest of the hour is about.
+-->
 
 ---
 
 ## The ownership rules
 
-1. Every value has one owner, a variable.
-2. When the owner goes out of scope, the value is freed.
-3. Assigning or passing the value moves it to a new owner. The old one
-   can't be used anymore.
+1. Every value has one owner
+2. Owner goes out of scope, value is freed
+3. Assigning or passing a value **moves** it
 
 ```rust
 {
@@ -190,9 +191,10 @@ check is called ownership, and it's what the rest of this hour is about.
 }                                 // t goes out of scope, string freed once
 ```
 
-Rule 3 is the one that surprises everyone. It's what makes rule 2 safe:
-there is exactly one variable responsible for freeing, so it happens exactly
-once.
+<!--
+Rule 3 surprises everyone. It is what makes rule 2 safe: exactly one
+variable is responsible for freeing, so it happens exactly once.
+-->
 
 ---
 
@@ -200,20 +202,21 @@ once.
 
 ```rust
 let s = String::from("A1");
-let t = s;              // move: copies ptr/len/cap, s is now invalid
-let u = t.clone();      // explicit deep copy, new heap allocation
+let t = s;              // move: s is now invalid
+let u = t.clone();      // explicit deep copy
 
 let a = 5;
 let b = a;              // i32 is `Copy`: a is still valid
 ```
 
-Plain numbers, `bool`, `char` and tuples of those are copied, since they're
-just a few bytes on the stack. Anything with heap memory behind it moves,
-and copying it is always spelled out with `.clone()`.
+- Numbers, `bool`, `char`: copied
+- Anything with heap memory: moved, `.clone()` to copy
 
-For the C++ people: `auto t = s;` copies in C++ and moves in Rust, and
-`std::move` is the default rather than something you ask for. Using a moved
-variable is a compile error, not undefined behaviour.
+<!--
+Copy types are a few bytes on the stack, duplicating them is free.
+For the C++ people: `auto t = s;` copies in C++ and moves in Rust.
+std::move is the default. Using a moved variable is a compile error, not UB.
+-->
 
 ---
 
@@ -254,8 +257,7 @@ describe(&name);    // lend it again
 
 ## The borrowing rule
 
-At any time, either any number of read-only references `&T`, or a single
-`&mut T`. Never both. And a reference can't outlive what it points to.
+Either many `&T`, or one `&mut T`. Never both.
 
 ```rust
 let mut readings = vec![0.41, 0.39];
@@ -264,11 +266,13 @@ readings.push(0.40);          // error: readings is borrowed
 println!("{first}");
 ```
 
-`push` may move the whole vector to a bigger block of memory, and `first`
-would then point into the old, freed block. In C++ this compiles and runs,
-and it's a bug you find only when the vector happens to grow.
+`push` may move the vector. `first` would point at freed memory.
 
-<!-- This is the moment to tell your own vector-invalidation story if you have one. -->
+<!--
+In C++ this compiles and runs, and you find the bug only when the vector
+happens to grow. A reference can never outlive what it points to.
+This is the moment to tell your own vector-invalidation story if you have one.
+-->
 
 ---
 

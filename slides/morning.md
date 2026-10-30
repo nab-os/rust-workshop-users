@@ -33,72 +33,73 @@ style: |
 
 ## What is Rust?
 
-A compiled language, strongly typed, with no garbage collector. Rust code
-runs about as fast as C or C++.
+- Compiled, strongly typed, no garbage collector
+- As fast as C and C++
+- Memory and thread safety checked by the compiler
+- One tool for building, testing, packages, docs
+- Stable since 2015
 
-What makes it different: the compiler checks memory use for you. No
-dangling pointers, no use after free, no data races between threads. If
-you break one of those rules, the program doesn't compile.
-
-The other thing people like is that the tooling comes with the language:
-one tool builds, tests, fetches packages, formats and documents your code.
-
-First stable version in 2015, so it's not new anymore.
-
-<!-- Say in one sentence why *you* got into it. People remember that more than the bullet points. -->
+<!--
+The compiler checks memory use for you: no dangling pointers, no use after
+free, no data races. Break a rule and it doesn't compile.
+Say in one sentence why *you* got into it. People remember that more than
+the bullet points.
+-->
 
 ---
 
 ## Who uses it?
 
-Operating systems: parts of the Linux kernel, Windows and Android are
-in Rust. Firefox and Chromium too.
+- Linux, Windows, Android, Firefox, Chromium
+- Python tooling: `uv`, `ruff`, `polars`, `pydantic`, `cryptography`
+- Labs: keep the Python, rewrite the slow part
 
-Closer to us: a lot of the Python tooling you already run is Rust
-underneath. `uv`, `ruff`, `polars`, `pydantic`, the `cryptography` package.
-None of those would be as fast in pure Python.
-
-Labs mostly use it for the same thing: keep the Python, rewrite the slow
-part in Rust, call it from Python.
-
-<!-- If someone in the lab has done this, or you have, name the project. -->
+<!--
+Much of the Python tooling people here already run is Rust underneath, and
+would not be as fast in pure Python.
+If someone in the lab has done the "rewrite the slow part" thing, or you
+have, name the project.
+-->
 
 ---
 
 ## Why not just C++?
 
-Same speed. The differences are elsewhere.
+Same speed. Different everywhere else:
 
-- Memory bugs are compile errors instead of crashes at 2am. Dangling
-  references, use after free, iterator invalidation: all caught.
-- No null. If a value can be absent, its type says so.
-- One build tool and one package manager, `cargo`, instead of CMake plus
-  whatever you glue onto it.
-- Tests, docs and formatting are built in.
+- Memory bugs are compile errors
+- No null
+- One build tool and package manager
+- Tests, docs, formatting built in
 
-The cost is a steeper start. The compiler refuses code until it can prove
-it's safe, and at first it refuses a lot of code you know is fine. That
-feeling goes away after a few weeks.
+The cost: a steeper start
 
-<!-- C++ people in the room: ask them what their worst memory bug was. -->
+<!--
+Dangling references, use after free, iterator invalidation: all caught at
+compile time instead of at 2am.
+The compiler refuses code until it can prove it safe, and at first it refuses
+a lot of code you know is fine. That feeling goes away after a few weeks.
+C++ people in the room: ask them what their worst memory bug was.
+-->
 
 ---
 
 ## Why not just Python?
 
-You shouldn't replace Python with Rust. Python is better at exploring,
-plotting, gluing things together.
+Keep Python for exploring, plotting, gluing.
 
-Where Rust earns its keep:
+Rust for:
 
-- loops that are too slow, where you'd otherwise reach for C
-- code that has to be right, because the types and the error handling
-  are checked before anything runs
-- something you hand to someone else as a single executable, with no
-  environment to set up
+- loops that are too slow
+- code that has to be right
+- a single executable to hand over
 
-The two work well together, and that's the realistic way to use Rust in a
-lab that already has a pile of Python.
+<!--
+Where you would otherwise reach for C. Types and error handling are checked
+before anything runs. No environment to set up on the other side.
+The realistic way to use Rust in a lab with a pile of Python is together,
+not instead.
+-->
 
 ---
 
@@ -436,7 +437,15 @@ if temperature > 30.0 {
 while n != 1 {
     n = if n % 2 == 0 { n / 2 } else { 3 * n + 1 };
 }
+```
 
+No parentheses around conditions, braces always required.
+
+---
+
+## Loops
+
+```rust
 for i in 0..10 { }          // 0 to 9
 for i in 0..=10 { }         // 0 to 10
 for x in &values { }        // each element of a list
@@ -446,8 +455,6 @@ loop {                      // forever, until `break`
     break;
 }
 ```
-
-No parentheses around conditions, braces always required.
 
 ---
 
@@ -641,14 +648,18 @@ that can fail.
 
 ## Recap
 
-- `cargo` does everything: new, run, test, add, fmt, clippy, doc
-- Variables are immutable unless `mut`, types don't convert implicitly
-- Blocks, `if` and `match` are expressions
-- `struct` + `impl` for data and methods, `enum` + `match` for alternatives
-- `Option` instead of null, `Result` instead of exceptions, `?` to propagate
+- `cargo` does everything
+- Immutable by default, no implicit conversions
+- Blocks, `if`, `match` are expressions
+- `struct` + `impl`, `enum` + `match`
+- `Option` instead of null, `Result` instead of exceptions
 
-**This afternoon**: a real program, and the thing that makes Rust Rust:
-ownership. Why did `ex01` need `.parse()`, and what is that `&` in `&str`?
+This afternoon: ownership. What is that `&` in `&str`?
+
+<!--
+Tease the afternoon: why did ex01 need .parse()? Why do some functions take
+&str and others String?
+-->
 
 ---
 

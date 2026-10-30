@@ -64,10 +64,20 @@ pub fn summarize(values: &[f64]) -> Option<Summary> {
     if values.is_empty() {
         return None;
     }
+    let mut total = 0.0;
+    let mut min = values[0];
+    let mut max = values[0];
+    for &v in values {
+        total += v;
+        if v < min {
+            min = v;
+        }
+        if v > max {
+            max = v;
+        }
+    }
     let count = values.len();
-    let mean = values.iter().sum::<f64>() / count as f64;
-    let min = values.iter().copied().fold(f64::INFINITY, f64::min);
-    let max = values.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    let mean = total / count as f64;
     Some(Summary {
         count,
         mean,

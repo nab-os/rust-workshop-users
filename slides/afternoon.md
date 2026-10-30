@@ -356,8 +356,6 @@ fn group_by_sample(measurements: &[Measurement]) -> HashMap<&str, Vec<f64>> {
 ```rust
 let total: f64 = values.iter().sum();
 let mean = total / values.len() as f64;
-let max = values.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-
 let big: Vec<f64> = values.iter().copied().filter(|&v| v > 1.0).collect();
 let names: Vec<&str> = measurements.iter().map(|m| m.sample.as_str()).collect();
 ```
@@ -406,15 +404,19 @@ The file is closed automatically when `file` goes out of scope (RAII again).
 ```rust
 let args: Vec<String> = std::env::args().skip(1).collect();
 
-match args.as_slice() {
-    [cmd, path] if cmd == "summary" => summary(path, None),
-    [cmd, path, out] if cmd == "summary" => summary(path, Some(out)),
-    [cmd, path, sample, value] if cmd == "add" => add(path, sample, value),
+if args.is_empty() {
+    return Err(USAGE.into());
+}
+match args[0].as_str() {
+    "summary" if args.len() == 2 => summary(&args[1], None),
+    "summary" if args.len() == 3 => summary(&args[1], Some(&args[2])),
+    "add" if args.len() == 4 => add(&args[1], &args[2], &args[3]),
     _ => Err(USAGE.into()),
 }
 ```
 
-Slice patterns + guards. For real tools, use the `clap` crate.
+`match` on strings, with a guard (`if ...`) on each arm. Good enough here.
+For a real tool, use the `clap` crate.
 
 ---
 

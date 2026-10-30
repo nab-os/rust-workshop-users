@@ -212,8 +212,10 @@ fn summarize(values: &[f64]) -> Option<Summary> {
 }
 ```
 
-Hints: `values.iter().sum::<f64>()`, `values.len() as f64`, and
-`values.iter().copied().fold(f64::INFINITY, f64::min)`.
+A `for` loop is enough: start `min` and `max` at `values[0]`, add every
+value to a running total, and compare as you go. `values.len() as f64` for
+the mean. (Iterators can do it in one line each, but there is no prize for
+that today.)
 
 Run the program twice. Is the order of the samples the same? Replace
 `HashMap` with `BTreeMap` and run it again.
@@ -250,17 +252,24 @@ cargo run -- add data/measurements.csv C3 2.001       # append a measurement
 
 - Validate the new measurement with your `parse_line` before writing it, so
   `add ... C3 nope` is refused.
-- Matching on the arguments is neat with slice patterns:
+- Collect the arguments into a `Vec<String>` and match on the first one:
 
   ```rust
   let args: Vec<String> = std::env::args().skip(1).collect();
-  match args.as_slice() {
-      [cmd, path] if cmd == "summary" => summary(path, None),
-      [cmd, path, out] if cmd == "summary" => summary(path, Some(out)),
-      [cmd, path, sample, value] if cmd == "add" => add(path, sample, value),
+  if args.is_empty() {
+      return Err(USAGE.into());
+  }
+  match args[0].as_str() {
+      "summary" if args.len() == 2 => summary(&args[1], None),
+      "summary" if args.len() == 3 => summary(&args[1], Some(&args[2])),
+      "add" if args.len() == 4 => add(&args[1], &args[2], &args[3]),
       _ => Err(USAGE.into()),
   }
   ```
+
+  `as_str()` turns the `String` into a `&str` so it can be compared with the
+  literals. The `if` after a pattern is a guard: the arm only matches when
+  it's true.
 
 Run it without arguments. The usage message is printed in a strange way.
 Why? We'll fix it in the next step.

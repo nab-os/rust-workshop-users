@@ -68,10 +68,20 @@ fn summarize(values: &[f64]) -> Option<Summary> {
     if values.is_empty() {
         return None;
     }
+    let mut total = 0.0;
+    let mut min = values[0];
+    let mut max = values[0];
+    for &v in values {
+        total += v;
+        if v < min {
+            min = v;
+        }
+        if v > max {
+            max = v;
+        }
+    }
     let count = values.len();
-    let mean = values.iter().sum::<f64>() / count as f64;
-    let min = values.iter().copied().fold(f64::INFINITY, f64::min);
-    let max = values.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    let mean = total / count as f64;
     Some(Summary {
         count,
         mean,
@@ -125,10 +135,13 @@ fn add(path: &str, sample: &str, value: &str) -> Result<(), Box<dyn Error>> {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().skip(1).collect();
-    match args.as_slice() {
-        [cmd, path] if cmd == "summary" => summary(path, None),
-        [cmd, path, out] if cmd == "summary" => summary(path, Some(out)),
-        [cmd, path, sample, value] if cmd == "add" => add(path, sample, value),
+    if args.is_empty() {
+        return Err(USAGE.into());
+    }
+    match args[0].as_str() {
+        "summary" if args.len() == 2 => summary(&args[1], None),
+        "summary" if args.len() == 3 => summary(&args[1], Some(&args[2])),
+        "add" if args.len() == 4 => add(&args[1], &args[2], &args[3]),
         _ => Err(USAGE.into()),
     }
 }

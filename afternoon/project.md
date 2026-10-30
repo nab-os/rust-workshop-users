@@ -17,7 +17,7 @@ B2,oops
 ,0.500
 ```
 
-Some lines are deliberately broken. Real data always is.
+Some lines are deliberately broken, since real files always have a few.
 
 The finished tool will work like this:
 

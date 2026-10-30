@@ -33,55 +33,72 @@ style: |
 
 ## What is Rust?
 
-- A compiled, statically typed language, first stable release in 2015
-- As fast as C and C++: no garbage collector, no runtime
-- **Memory safe** without a garbage collector: the compiler checks it
-- No data races in multithreaded code, also checked by the compiler
-- Excellent tooling, all official: build, packages, tests, docs, formatter, linter
+A compiled language, strongly typed, with no garbage collector. Rust code
+runs about as fast as C or C++.
 
-> "If it compiles, it usually works" is an exaggeration, but not a big one.
+What makes it different: the compiler checks memory use for you. No
+dangling pointers, no use after free, no data races between threads. If
+you break one of those rules, the program doesn't compile.
+
+The other thing people like is that the tooling comes with the language:
+one tool builds, tests, fetches packages, formats and documents your code.
+
+First stable version in 2015, so it's not new anymore.
+
+<!-- Say in one sentence why *you* got into it. People remember that more than the bullet points. -->
 
 ---
 
 ## Who uses it?
 
-- Linux kernel, Windows kernel, Android, Chromium, Firefox
-- Cloud infrastructure: AWS (Firecracker), Cloudflare, Discord
-- **Python tooling**: `uv`, `ruff`, `polars`, `pydantic-core`, `cryptography`
-  are all written in Rust
-- Science: fast Python extensions with PyO3, numerics with `ndarray`,
-  `nalgebra`, data with `polars`
+Operating systems: parts of the Linux kernel, Windows and Android are
+in Rust. Firefox and Chromium too.
 
-Recurring story: "we rewrote the slow part of our Python in Rust and it's now
-50x faster, and it doesn't segfault."
+Closer to us: a lot of the Python tooling you already run is Rust
+underneath. `uv`, `ruff`, `polars`, `pydantic`, the `cryptography` package.
+None of those would be as fast in pure Python.
+
+Labs mostly use it for the same thing: keep the Python, rewrite the slow
+part in Rust, call it from Python.
+
+<!-- If someone in the lab has done this, or you have, name the project. -->
 
 ---
 
 ## Why not just C++?
 
-| | C++ | Rust |
-|---|---|---|
-| Speed | ✔ | ✔ |
-| Use-after-free, dangling pointers | possible | compile error |
-| Data races | possible | compile error |
-| Null pointers | yes | no null, `Option<T>` instead |
-| Build system | CMake, Meson, Bazel... | `cargo` |
-| Packages | vcpkg, conan, copy the source | `cargo add` |
-| Tests, docs, formatting | pick a tool | built in |
+Same speed. The differences are elsewhere.
 
-The price: a steeper start. The compiler is strict, and will refuse code
-until it can prove it's safe.
+- Memory bugs are compile errors instead of crashes at 2am. Dangling
+  references, use after free, iterator invalidation: all caught.
+- No null. If a value can be absent, its type says so.
+- One build tool and one package manager, `cargo`, instead of CMake plus
+  whatever you glue onto it.
+- Tests, docs and formatting are built in.
+
+The cost is a steeper start. The compiler refuses code until it can prove
+it's safe, and at first it refuses a lot of code you know is fine. That
+feeling goes away after a few weeks.
+
+<!-- C++ people in the room: ask them what their worst memory bug was. -->
 
 ---
 
 ## Why not just Python?
 
-- Python is great for gluing things together and exploring
-- Rust is for the parts where you need:
-  - **speed** (10x to 100x on loops is common)
-  - **reliability**: types and errors checked before running
-  - **a single binary** to hand to someone, no environment to set up
-- They work well together: write the hot loop in Rust, call it from Python
+You shouldn't replace Python with Rust. Python is better at exploring,
+plotting, gluing things together.
+
+Where Rust earns its keep:
+
+- loops that are too slow, where you'd otherwise reach for C
+- code that has to be right, because the types and the error handling
+  are checked before anything runs
+- something you hand to someone else as a single executable, with no
+  environment to set up
+
+The two work well together, and that's the realistic way to use Rust in a
+lab that already has a pile of Python.
 
 ---
 
@@ -400,8 +417,8 @@ cargo run --bin ex02_functions
 Replace each `todo!()` with a real implementation until the program prints
 `ex02 done!`.
 
-`todo!()` is a macro that compiles to "crash here with 'not yet implemented'".
-Very useful to sketch a program.
+`todo!()` crashes with "not yet implemented" if it's reached. Handy for
+sketching a program and filling in the pieces one by one.
 
 ---
 

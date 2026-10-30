@@ -150,36 +150,49 @@ s │ ptr ───────┼───────────▶ │c│o�
   └────────────┘
 ```
 
-- Fixed size, known at compile time: on the stack, freed automatically
-- Growable data (`String`, `Vec`, `HashMap`): on the heap, someone has to
-  free it. **Who? And when?**
+`n` has a fixed size, it lives on the stack and disappears with the
+function. The text in `s` can grow, so it lives on the heap, and somebody
+has to give that memory back at some point.
+
+<!-- Draw this on the board rather than showing the slide, it sticks better. -->
 
 ---
 
 ## Three answers to "who frees it?"
 
-| | How | Cost |
-|---|---|---|
-| C | you call `free()` | forget it: leak. Twice: crash. Too early: corruption. |
-| Python, Java | garbage collector | runtime overhead, pauses, less control |
-| C++ | RAII, destructors, smart pointers | safe *if* you follow the rules, nothing enforces it |
-| **Rust** | **ownership**, checked by the compiler | none at runtime |
+In C, you do, by hand. Forget and you leak, do it twice and you crash.
+
+In Python (and Java, Go...), a garbage collector does it while the program
+runs. Convenient, costs some speed and some predictability.
+
+In C++, destructors do it when a variable goes out of scope. That works
+well, as long as nobody keeps a pointer to something that was destroyed.
+Nothing stops you from doing that.
+
+Rust takes the C++ idea, scope-based, no runtime cost, and adds a compiler
+check that nobody is still pointing at the memory when it's freed. That
+check is called ownership, and it's what the rest of this hour is about.
 
 ---
 
 ## The ownership rules
 
-1. Each value has exactly **one owner** (a variable)
-2. When the owner goes out of scope, the value is **dropped** (freed)
-3. Assigning or passing a value **moves** it to a new owner
+1. Every value has one owner, a variable.
+2. When the owner goes out of scope, the value is freed.
+3. Assigning or passing the value moves it to a new owner. The old one
+   can't be used anymore.
 
 ```rust
 {
     let s = String::from("A1");   // s owns the string
-    let t = s;                    // ownership moves to t
+    let t = s;                    // now t does
     println!("{s}");              // error: s was moved
-}                                 // t goes out of scope: string freed, once
+}                                 // t goes out of scope, string freed once
 ```
+
+Rule 3 is the one that surprises everyone. It's what makes rule 2 safe:
+there is exactly one variable responsible for freeing, so it happens exactly
+once.
 
 ---
 
@@ -188,18 +201,19 @@ s │ ptr ───────┼───────────▶ │c│o�
 ```rust
 let s = String::from("A1");
 let t = s;              // move: copies ptr/len/cap, s is now invalid
-let u = t.clone();      // explicit deep copy: new heap allocation
+let u = t.clone();      // explicit deep copy, new heap allocation
 
 let a = 5;
 let b = a;              // i32 is `Copy`: a is still valid
 ```
 
-- Small, stack-only types are `Copy`: integers, floats, `bool`, `char`,
-  tuples of those
-- Everything else moves. Copying is always explicit with `.clone()`
+Plain numbers, `bool`, `char` and tuples of those are copied, since they're
+just a few bytes on the stack. Anything with heap memory behind it moves,
+and copying it is always spelled out with `.clone()`.
 
-C++: `auto t = s;` copies, `std::move(s)` moves.
-Rust: the reverse, and using `s` after a move is a compile error.
+For the C++ people: `auto t = s;` copies in C++ and moves in Rust, and
+`std::move` is the default rather than something you ask for. Using a moved
+variable is a compile error, not undefined behaviour.
 
 ---
 
@@ -240,12 +254,8 @@ describe(&name);    // lend it again
 
 ## The borrowing rule
 
-At any time, **either**:
-
-- any number of shared references `&T`, **or**
-- exactly one mutable reference `&mut T`
-
-And a reference can never outlive the value it points to.
+At any time, either any number of read-only references `&T`, or a single
+`&mut T`. Never both. And a reference can't outlive what it points to.
 
 ```rust
 let mut readings = vec![0.41, 0.39];
@@ -254,8 +264,11 @@ readings.push(0.40);          // error: readings is borrowed
 println!("{first}");
 ```
 
-Why? `push` may reallocate the vector, and `first` would point to freed
-memory. In C++ this compiles, and it's a classic bug.
+`push` may move the whole vector to a bigger block of memory, and `first`
+would then point into the old, freed block. In C++ this compiles and runs,
+and it's a bug you find only when the vector happens to grow.
+
+<!-- This is the moment to tell your own vector-invalidation story if you have one. -->
 
 ---
 
@@ -286,9 +299,11 @@ struct Measurement { sample: String, value: f64 }
 fn parse_line(line: &str) -> Result<Measurement, String>
 ```
 
-- `parse_line` only **reads** the line: borrow it, `&str`
-- The `Measurement` must **own** its sample name: it lives on after the
-  line of text (and the whole file content) is gone
+`parse_line` only reads the line, so it borrows it: `&str`.
+
+The `Measurement` has to own its sample name, because it will still be
+around once the file contents have been dropped. That's why step 2 needed
+`.to_string()`.
 
 ---
 

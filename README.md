@@ -37,8 +37,8 @@ and splitting a project into a cargo workspace.
 ## Getting the material
 
 ```sh
-git clone <url of this repository>
-cd rust-workshop-participants
+git clone https://github.com/nab-os/rust-workshop-users.git
+cd rust-workshop-users
 ```
 
 Run `git pull` on the morning of the workshop to get any last changes.
